@@ -117,31 +117,41 @@ def generate_board(
     n: int = 12,
     n_infra: int | None = None,
     n_drains: int = 2,
-    emission_low: float = 1.0,
-    emission_high: float = 5.0,
+    emission_low: float = 15.0,
+    emission_high: float = 100.0,
     seed: int | None = None,
+    layout: np.ndarray | None = None,
 ) -> Board:
     """Generate a randomized city board.
 
     n_infra defaults to ~45% of cells. Pollution sources (the infra emission
     values) are randomized in [emission_low, emission_high].
+
+    If `layout` is provided, it must be a 2D array of Cell values. m/n/n_infra/
+    n_drains are ignored — the layout is used as-is. emission_low/emission_high
+    and seed still apply.
     """
     rng = np.random.default_rng(seed)
-    total = m * n
-    if n_infra is None:
-        n_infra = int(0.45 * total)
-    n_infra = max(0, min(n_infra, total - n_drains))
+    if layout is not None:
+        if layout.ndim != 2:
+            raise ValueError(f"layout must be 2D, got shape {layout.shape}")
+        base = np.asarray(layout, dtype=int)
+    else:
+        total = m * n
+        if n_infra is None:
+            n_infra = int(0.45 * total)
+        n_infra = max(0, min(n_infra, total - n_drains))
 
-    base = np.full((m, n), Cell.EMPTY, dtype=int)
-    flat = rng.permutation(total)
+        base = np.full((m, n), Cell.EMPTY, dtype=int)
+        flat = rng.permutation(total)
 
-    drain_idx = flat[:n_drains]
-    infra_idx = flat[n_drains:n_drains + n_infra]
+        drain_idx = flat[:n_drains]
+        infra_idx = flat[n_drains:n_drains + n_infra]
 
-    for idx in drain_idx:
-        base[idx // n, idx % n] = Cell.DRAIN
-    for idx in infra_idx:
-        base[idx // n, idx % n] = Cell.INFRA
+        for idx in drain_idx:
+            base[idx // n, idx % n] = Cell.DRAIN
+        for idx in infra_idx:
+            base[idx // n, idx % n] = Cell.INFRA
 
     emission = np.zeros((m, n), dtype=float)
     infra_mask = base == Cell.INFRA

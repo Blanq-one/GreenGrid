@@ -17,14 +17,14 @@ import numpy as np
 
 
 def test_budget_respected():
-    env = GreenSpaceEnv(budget=10.0, seed=1)
+    env = GreenSpaceEnv(budget=100000.0, seed=1)
     env.reset(seed=1)
     res = RandomAgent(seed=1).solve(env)
     assert res.spent <= env.budget + 1e-6
 
 
 def test_placements_legal():
-    env = GreenSpaceEnv(budget=15.0, seed=2)
+    env = GreenSpaceEnv(budget=150000.0, seed=2)
     env.reset(seed=2)
     res = HillClimbingAgent(seed=2).solve(env)
     for r, c, g in res.env.current_placements():
@@ -36,7 +36,7 @@ def test_placements_legal():
 
 def test_green_helps():
     """A real agent should beat the do-nothing baseline."""
-    env = GreenSpaceEnv(budget=20.0, seed=3)
+    env = GreenSpaceEnv(budget=200000.0, seed=3)
     env.reset(seed=3)
     baseline = env.baseline_pollution()
     res = HillClimbingAgent(seed=3).solve(env)
@@ -44,7 +44,7 @@ def test_green_helps():
 
 
 def test_local_search_beats_random():
-    env = GreenSpaceEnv(budget=20.0, seed=5)
+    env = GreenSpaceEnv(budget=200000.0, seed=5)
     env.reset(seed=5)
     rand = RandomAgent(seed=5).solve(env)
     hc = HillClimbingAgent(seed=5).solve(env)
@@ -54,7 +54,7 @@ def test_local_search_beats_random():
 
 def test_gym_step_loop():
     """The standard gymnasium loop runs without error."""
-    env = GreenSpaceEnv(budget=12.0, seed=4)
+    env = GreenSpaceEnv(budget=120000.0, seed=4)
     obs, info = env.reset(seed=4)
     assert obs.shape == env.observation_space.shape
     steps = 0
@@ -77,7 +77,7 @@ def test_gym_step_loop():
 def test_constructive_respects_spec():
     """Constructive search only adds, and spends the budget under a pollution-only
     objective (the spec's 'end once budget fully utilized')."""
-    env = GreenSpaceEnv(budget=15.0, seed=6)
+    env = GreenSpaceEnv(budget=150000.0, seed=6)
     env.reset(seed=6)
     res = ConstructiveHillClimbingAgent(seed=6).solve(env)
     assert res.spent <= env.budget + 1e-6
@@ -89,7 +89,7 @@ def test_constructive_respects_spec():
 
 
 def test_neural_stub_runs_and_helps():
-    env = GreenSpaceEnv(budget=18.0, seed=8)
+    env = GreenSpaceEnv(budget=180000.0, seed=8)
     env.reset(seed=8)
     res = NeuralPlacementAgent(seed=8).solve(env)
     assert res.spent <= env.budget + 1e-6
@@ -101,7 +101,7 @@ def test_extra_feature_adds_channel():
     other code change."""
     board = generate_board(m=8, n=8, seed=9)
     board.extra["slope"] = np.ones(board.shape, dtype=float)  # a made-up feature
-    env = GreenSpaceEnv(board=board, budget=10.0, seed=9)
+    env = GreenSpaceEnv(board=board, budget=100000.0, seed=9)
     obs, _ = env.reset(seed=9)
     assert obs.shape[0] == 7  # 6 base channels + 1 extra
     assert obs.shape == env.observation_space.shape
@@ -111,8 +111,8 @@ def test_extra_cost_term_applied():
     """A callable in cfg.extra_terms changes the objective without editing core."""
     base_cfg = CostConfig()
     penalized = CostConfig(extra_terms=[lambda ctx: 100.0 * (ctx["placements"] >= 0).sum()])
-    env_a = GreenSpaceEnv(budget=10.0, cost_config=base_cfg, seed=10); env_a.reset(seed=10)
-    env_b = GreenSpaceEnv(budget=10.0, cost_config=penalized, seed=10); env_b.reset(seed=10)
+    env_a = GreenSpaceEnv(budget=100000.0, cost_config=base_cfg, seed=10); env_a.reset(seed=10)
+    env_b = GreenSpaceEnv(budget=100000.0, cost_config=penalized, seed=10); env_b.reset(seed=10)
     # place one identical green space in each
     r, c, g = env_a.valid_placements()[0]
     env_a.place(r, c, g); env_b.place(r, c, g)

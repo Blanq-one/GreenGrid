@@ -21,9 +21,9 @@ from .grid import Cell
 
 # fraction of throughput a green cell removes
 DEFAULT_RETENTION = {
-    Cell.RAIN_BARREL: 0.25,
-    Cell.RAIN_GARDEN: 0.60,
-    Cell.REDEVELOPED: 0.75,
+    Cell.RAIN_BARREL: 0.01,
+    Cell.RAIN_GARDEN: 0.15,
+    Cell.REDEVELOPED: 0.25,
 }
 
 

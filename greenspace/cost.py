@@ -21,9 +21,9 @@ from .grid import Cell
 @dataclass
 class CostConfig:
     # placement costs (budget units)
-    barrel_cost: float = 1.0
-    garden_cost: float = 3.0
-    redevelop_cost: float = 6.0
+    barrel_cost: float = 50.0
+    garden_cost: float = 10000.0
+    redevelop_cost: float = 50000.0
 
     # objective weights
     pollution_weight: float = 1.0
