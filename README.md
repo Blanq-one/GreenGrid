@@ -10,8 +10,9 @@ half can drop in without rewriting the agents.
 
 ## The problem
 
-Rain washes pollutants (fertilizer nitrogen, tire rubber, etc.) off hard surfaces
-into freshwater, causing algae blooms. Green spaces absorb and filter that runoff.
+Rain washes pollutants (sediment, fertilizer nitrogen, tire rubber, etc.) off of impermeable urban
+surfaces into stormwater systems and local water bodies, causing various environmental issues such as algae blooms, marine species die-off, and flooding.
+Green spaces absorb and filter some of the volume from that runoff..
 We model a city as an `m x n` grid:
 
 - **infra** cells emit pollution
@@ -25,9 +26,9 @@ Green options, cheapest to priciest:
 
 | type        | goes on   | cost | effect       |
 |-------------|-----------|------|--------------|
-| rain barrel | infra     | low  | small (25%)  |
+| rain barrel | infra     | low  | small (15%)  |
 | rain garden | empty     | mid  | medium (60%) |
-| redevelop   | infra     | high | large (75%)  |
+| redevelop   | infra     | high | large (80%)  |
 
 ## Quick start
 
