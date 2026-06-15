@@ -10,6 +10,7 @@ end and that the local search agents actually cut pollution versus doing nothing
 from __future__ import annotations
 
 import argparse
+import numpy as np
 
 from greenspace import GreenSpaceEnv, CostConfig, generate_board, render_ascii
 from greenspace.agents import (
@@ -20,11 +21,10 @@ from greenspace.agents import (
     NeuralPlacementAgent,
 )
 
-
-def run(seed: int = 7, save: str | None = None):
-    board = generate_board(m=12, n=12, n_drains=2, seed=seed)
+def run(seed: int = 7, save: str | None = None, layout: np.ndarray | None = None):
+    board = generate_board(m=12, n=12, n_drains=2, seed=seed, layout=layout)
     cfg = CostConfig(pollution_weight=1.0, cost_weight=0.0)  # budget is the hard cap
-    env = GreenSpaceEnv(board=board, budget=18.0, cost_config=cfg, seed=seed)
+    env = GreenSpaceEnv(board=board, budget=180000.0, cost_config=cfg, seed=seed)
     env.reset(seed=seed)
 
     print("=== starting board ===")
@@ -76,4 +76,21 @@ if __name__ == "__main__":
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("--save", type=str, default=None, help="path to save a PNG")
     args = ap.parse_args()
+
+    layout = np.array([
+        [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0],
+        [2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2],
+        [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1],
+        [1, 1, 1, 1, 2, 0, 0, 0, 1, 1, 1, 1],
+        [1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 0, 0, 0, 1, 1, 2, 1, 1],
+        [1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+        [1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+    ])
+
     run(seed=args.seed, save=args.save)
+    run(seed=args.seed, save='planned_' + args.save, layout=layout)
