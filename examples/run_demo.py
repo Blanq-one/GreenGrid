@@ -10,6 +10,8 @@ end and that the local search agents actually cut pollution versus doing nothing
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
+
 import numpy as np
 
 from greenspace import GreenSpaceEnv, CostConfig, generate_board, render_ascii
@@ -18,8 +20,17 @@ from greenspace.agents import (
     HillClimbingAgent,
     ConstructiveHillClimbingAgent,
     SimulatedAnnealingAgent,
-    NeuralPlacementAgent,
 )
+
+
+def planned_save_path(save: str | None) -> str:
+    """Return a concrete filename for the planned-layout demo image."""
+
+    if save is None:
+        return "planned_board.png"
+    path = Path(save)
+    return str(path.with_name("planned_" + path.name))
+
 
 def run(seed: int = 7, save: str | None = None, layout: np.ndarray | None = None):
     board = generate_board(m=12, n=12, n_drains=2, seed=seed, layout=layout)
@@ -41,7 +52,6 @@ def run(seed: int = 7, save: str | None = None, layout: np.ndarray | None = None
         HillClimbingAgent(variant="steepest", seed=seed),
         HillClimbingAgent(variant="first_choice", seed=seed),
         SimulatedAnnealingAgent(seed=seed),
-        NeuralPlacementAgent(seed=seed),   # stub: heuristic scorer until a model is trained
     ]
 
     results = {}
@@ -92,5 +102,6 @@ if __name__ == "__main__":
         [1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
     ])
 
-    run(seed=args.seed, save=args.save)
-    run(seed=args.seed, save='planned_' + args.save, layout=layout)
+    save = args.save or "board.png"
+    run(seed=args.seed, save=save)
+    run(seed=args.seed, save=planned_save_path(args.save), layout=layout)
