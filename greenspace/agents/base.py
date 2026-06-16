@@ -2,8 +2,8 @@
 
 Agents operate on a GreenSpaceEnv. The contract is just `solve(env) -> SolveResult`.
 The env passed in is left untouched; agents work on clones so callers can compare
-fairly. This common shape is what lets us drop in a NN-based agent later without
-changing the demo or evaluation harness.
+fairly. This common shape lets the demo and evaluation harness compare agents
+without special cases.
 """
 
 from __future__ import annotations

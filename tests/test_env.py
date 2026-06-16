@@ -11,7 +11,6 @@ from greenspace.agents import (
     ConstructiveHillClimbingAgent,
     SimulatedAnnealingAgent,
     RandomAgent,
-    NeuralPlacementAgent,
 )
 import numpy as np
 
@@ -74,6 +73,17 @@ def test_gym_step_loop():
     assert info["spent"] <= env.budget + 1e-6
 
 
+def test_gymnasium_checker_accepts_env():
+    """Gymnasium's checker verifies the reset(seed=...) contract."""
+    try:
+        from gymnasium.utils.env_checker import check_env
+    except Exception:
+        return
+
+    env = GreenSpaceEnv(board=generate_board(m=4, n=4, seed=1), budget=50000.0)
+    check_env(env)
+
+
 def test_constructive_respects_spec():
     """Constructive search only adds, and spends the budget under a pollution-only
     objective (the spec's 'end once budget fully utilized')."""
@@ -85,14 +95,6 @@ def test_constructive_respects_spec():
     assert res.env.remaining_budget() < min(
         env.cfg.barrel_cost, env.cfg.garden_cost, env.cfg.redevelop_cost
     ) + 1e-6
-    assert res.pollution <= env.baseline_pollution() + 1e-6
-
-
-def test_neural_stub_runs_and_helps():
-    env = GreenSpaceEnv(budget=180000.0, seed=8)
-    env.reset(seed=8)
-    res = NeuralPlacementAgent(seed=8).solve(env)
-    assert res.spent <= env.budget + 1e-6
     assert res.pollution <= env.baseline_pollution() + 1e-6
 
 
@@ -126,8 +128,8 @@ if __name__ == "__main__":
         test_green_helps,
         test_local_search_beats_random,
         test_gym_step_loop,
+        test_gymnasium_checker_accepts_env,
         test_constructive_respects_spec,
-        test_neural_stub_runs_and_helps,
         test_extra_feature_adds_channel,
         test_extra_cost_term_applied,
     ]:

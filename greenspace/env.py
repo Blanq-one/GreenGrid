@@ -3,8 +3,7 @@
 It exposes two interfaces on purpose:
 
   1. The standard Gymnasium interface (reset / step / action_space /
-     observation_space). This is the contract the NN / RL side and any future
-     richer environment plug into.
+     observation_space).
 
   2. A set of plain helper methods (clone / place / remove / current_objective /
      valid_placements) that local search agents use directly, because local
@@ -108,7 +107,7 @@ class GreenSpaceEnv(gym.Env):
         self.placements = np.full((self.m, self.n), -1, dtype=int)
         self.spent = 0.0
 
-        # observation: stacked feature channels, RL/CNN ready
+        # observation: stacked feature channels
         #   0: base==EMPTY, 1: base==INFRA, 2: base==DRAIN
         #   3: emission (raw), 4: has_placement, 5: remaining-budget broadcast
         #   6+: any 2D feature map found in board.extra (added automatically)
@@ -122,6 +121,8 @@ class GreenSpaceEnv(gym.Env):
 
     # ---- gymnasium interface ---------------------------------------------
     def reset(self, *, seed: int | None = None, options: dict | None = None):
+        if _HAS_GYM:
+            super().reset(seed=seed)
         if seed is not None:
             self._seed = seed
         if self._provided_board is not None:
@@ -210,6 +211,8 @@ class GreenSpaceEnv(gym.Env):
         return simulate(
             self.board.base, self.placements, self.board.emission, self.board.flow,
             retention=self.cfg.retention, edge_runoff_counts=self.cfg.edge_runoff_counts,
+            runoff_coeff=self.board.extra.get("runoff_coeff"),
+            storm_depth=float(self.board.extra.get("storm_depth", 1.0)),
         )
 
     def current_objective(self) -> float:
@@ -229,6 +232,8 @@ class GreenSpaceEnv(gym.Env):
         return simulate(
             self.board.base, empty, self.board.emission, self.board.flow,
             retention=self.cfg.retention, edge_runoff_counts=self.cfg.edge_runoff_counts,
+            runoff_coeff=self.board.extra.get("runoff_coeff"),
+            storm_depth=float(self.board.extra.get("storm_depth", 1.0)),
         )
 
     # ---- internals --------------------------------------------------------
